@@ -3,6 +3,7 @@ const bodyParser = require('body-parser');
 const authRoutes = require('./src/routes/auth.route');
 const multer = require('multer');
 const { extendReqMiddleware } = require('./src/middleware/extendReq.middleware');
+const router = require('./src/routes');
 
 const PORT = 5000;
 
@@ -21,7 +22,7 @@ app.use((req, res, next) => {
   next();
 });
 
-app.use('/auth', authRoutes);
+app.use('/', router);
 
 app.listen(PORT, () => {
   console.log(`Listening on port ${PORT}`);
