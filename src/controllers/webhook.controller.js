@@ -12,7 +12,7 @@ const webhook = async (req, res) => {
       data: '',
     });
   } catch (error) {
-    logger('error', error);
+    console.log('error', error);
   }
 };
 
