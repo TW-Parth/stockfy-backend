@@ -1,18 +1,18 @@
-const mongoose = require("mongoose");
-const { mongoUrl } = require("../config/config.json");
+const mongoose = require('mongoose');
+const { mongoUrl } = require('../config/config.json');
 
-const primaryObj = new mongoose.Mongoose();
-
-const primaryConnection = primaryObj.createConnection(mongoUrl);
-
-primaryConnection.on("open", () => {
-  console.log("Primary database connected");
-});
-primaryConnection.on("error", (e) => {
-  console.log("Primary database connection error.");
-  console.log(e);
-});
-
-module.exports = {
-  primaryConnection,
+const options = {
+  keepAlive: true,
+  useNewUrlParser: true,
+  useUnifiedTopology: true,
 };
+
+const mongooseObj = new mongoose.Mongoose();
+// mongooseObj.set('debug', true);
+
+const dbConnection = mongooseObj.createConnection(mongoUrl, options);
+
+dbConnection.on('open', () => console.log(`Primary database connected. ${mongoUrl}`));
+dbConnection.on('error', (e) => console.log(`Primary database error. ${e}`));
+
+module.exports.dbConnection = dbConnection;

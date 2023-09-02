@@ -1,40 +1,22 @@
-const jwt = require("jsonwebtoken");
-const messages = require("../constants/messages.json");
+const jwt = require('jsonwebtoken');
 
 const isAuth = (req, res, next) => {
-  const authHeader = req.get("Authorization");
-  console.log("AUTH --------> ", authHeader);
+  const authHeader = req.get('Authorization');
   if (!authHeader) {
-    return res.status(400).json({
-      statusCode: 401,
-      code: "FAIL",
-      message: messages.NOT_AUTHENTICATED_MESSAGE,
-      data: {},
-    });
+    return res.error('Not authenticated.');
   }
-  const token = authHeader.split(" ")[1];
+  const token = authHeader.split(' ')[1];
   let decodedToken;
   try {
-    decodedToken = jwt.verify(token, "somesupersecret");
-    console.log("Stringify ----------", JSON.stringify(decodedToken, null, 2));
+    decodedToken = jwt.verify(token, 'somesupersecret');
     req.userId = decodedToken.userId;
     next();
   } catch (error) {
     if (error.message) {
-      return res.status(400).json({
-        statusCode: 401,
-        code: "FAIL",
-        message: messages.TOKEN_EXPIRED_MESSAGE,
-        data: {},
-      });
+      return res.error('Token expired.');
     }
 
-    res.status(500).json({
-      statusCode: 500,
-      code: "FAIL",
-      message: messages.INTERNAL_SERVER_ERROR_MESSAGE,
-      data: {},
-    });
+    res.internalServerError();
   }
 };
 

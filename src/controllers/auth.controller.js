@@ -1,85 +1,13 @@
-const messages = require("../constants/messages.json");
-const { UserModel } = require("../models/user.model");
-const crypto = require("crypto");
-const { hashString } = require("../helpers/crypto.helper");
-const { jwtToken } = require("../helpers/jwtToken.helper");
-const { USER_STATUS } = require("../constants/enums");
-const { error } = require("console");
-
-// const signup = async (req, res) => {
-//   try {
-//     const { firstName, lastName, email, password } = req.body;
-//     console.log(firstName, lastName, email, password);
-
-//     const regUser = await UserModel.findOne({
-//       email: email,
-//       isDeleted: false,
-//       userStatus: { $ne: USER_STATUS.BLOCKED },
-//     });
-//     if (regUser) {
-//       return res.status(400).json({
-//         statusCode: 400,
-//         code: "FAIL",
-//         message:
-//           regUser.userStatus === USER_STATUS.PENDING_VERIFICATION
-//             ? "Please Verify Your email address, check your mail"
-//             : "user already exist, please login to continue",
-//         data: {},
-//       });
-//     }
-//     const salt = crypto.randomBytes(16).toString("hex");
-//     const { hashStr } = hashString({ password, salt });
-//     const user = new UserModel({
-//       firstName: firstName,
-//       lastName: lastName,
-//       email: email,
-//       hashedPassword: hashStr,
-//       passwordSalt: salt,
-//     });
-
-//     const signupToken = jwtToken({ email: email });
-//     user.emailVerificationToken = signupToken.token;
-//     await user.save();
-//     const { token } = jwtToken({ email: email, userId: user.id });
-//     const userData = await UserModel.findById(user._id).select(
-//       "-createdAt -updatedAt -isDeleted -emailVerificationToken -forgotPasswordToken -passwordSalt -hashedPassword"
-//     );
-//     return res.status(200).json({
-//       statusCode: 200,
-//       code: "SUCCESS",
-//       message: messages.SUCCESS_MESSAGE,
-//       data: {
-//         user: userData,
-//         token: token,
-//       },
-//     });
-//   } catch (error) {
-//     console.log(error);
-//     res.status(500).json({
-//       statusCode: 500,
-//       code: "FAIL",
-//       message: messages.INTERNAL_SERVER_ERROR_MESSAGE,
-//       error: error,
-//       data: {},
-//     });
-//   }
-// };
+const { UserModel } = require('../models/user.model');
+const crypto = require('crypto');
+const { hashString } = require('../helpers/crypto.helper');
+const { jwtToken } = require('../helpers/jwtToken.helper');
 
 const signup = async (req, res) => {
-  console.log("Entered -----> ");
   try {
-    const {
-      firstName,
-      lastName,
-      email,
-      password,
-      gstNumber,
-      ecommerceName,
-      ecommerceWebsite,
-      phoneNumber,
-    } = req.body;
+    const { firstName, lastName, email, password, gstNumber, eCommerceName, eCommerceWebsite, phoneNumber } = req.validatedParams;
 
-    const salt = crypto.randomBytes(16).toString("hex");
+    const salt = crypto.randomBytes(16).toString('hex');
     const { hashStr } = hashString({ password, salt });
 
     const user = new UserModel({
@@ -89,8 +17,8 @@ const signup = async (req, res) => {
       hashedPassword: hashStr,
       passwordSalt: salt,
       gstNumber,
-      ecommerceName,
-      ecommerceWebsite,
+      eCommerceName,
+      eCommerceWebsite,
       phoneNumber,
     });
 
@@ -99,131 +27,72 @@ const signup = async (req, res) => {
     await user.save();
 
     const { token } = jwtToken({ email, userId: user.id });
-    const userData = await UserModel.findById(user._id).select(
-      "-createdAt -updatedAt -isDeleted -emailVerificationToken -forgotPasswordToken -passwordSalt -hashedPassword"
-    );
+    const userData = await UserModel.findById(user._id).select('-createdAt -updatedAt -isDeleted -emailVerificationToken -forgotPasswordToken -passwordSalt -hashedPassword');
 
-    return res.status(200).json({
-      statusCode: 200,
-      code: "SUCCESS",
-      message: messages.SUCCESS_MESSAGE,
-      data: {
-        user: userData,
-        token: token,
-      },
-    });
+    return res.ok({ data: { user: userData, token: token } });
   } catch (error) {
     console.log(error);
-    res.status(500).json({
-      statusCode: 500,
-      code: "FAIL",
-      message: messages.INTERNAL_SERVER_ERROR_MESSAGE,
-      error: error,
-      data: {},
-    });
+    res.internalServerError();
   }
 };
 
 const login = async (req, res) => {
   try {
-    const { email, password } = req.body;
+    const { email, password } = req.validatedParams;
     const user = await UserModel.findOne({ email: email, isDeleted: false });
     if (!user) {
-      return res.status(400).json({
-        statusCode: 400,
-        code: "FAIL",
-        message: 'Invalid email or password"',
-        data: {},
-      });
+      return res.error('Invalid email or password');
     }
 
     const salt = user.passwordSalt;
     const { hashStr } = hashString({ password, salt });
     const isVerified = hashStr === user.hashedPassword;
     if (!isVerified) {
-      return res.status(400).json({
-        statusCode: 400,
-        code: "FAIL",
-        message: "Invalid email or password",
-        data: {},
-      });
+      return res.error('Invalid email or password');
     }
     const { token } = jwtToken({ email: email, userId: user._id });
 
-    const userData = await UserModel.findById(user._id).select(
-      "-createdAt -updatedAt -isDeleted -emailVerificationToken -forgotPasswordToken -passwordSalt -hashedPassword"
-    );
-    return res.status(200).json({
-      statusCode: 200,
-      code: "SUCCESS",
-      message: messages.SUCCESS_MESSAGE,
+    const userData = await UserModel.findById(user._id).select('-createdAt -updatedAt -isDeleted -emailVerificationToken -forgotPasswordToken -passwordSalt -hashedPassword');
+    return res.ok({
       data: {
         user: userData,
         token,
       },
     });
   } catch (error) {
-    res.status(500).json({
-      statusCode: 500,
-      code: "FAIL",
-      message: messages.INTERNAL_SERVER_ERROR_MESSAGE,
-      error: error,
-      data: {},
-    });
+    res.internalServerError();
   }
 };
 
 const getProfile = async (req, res) => {
   try {
     const userId = req.userId;
-    console.log("--userId:::", userId);
-    const userData = await UserModel.findById(userId).select(
-      "-createdAt -updatedAt -isDeleted -emailVerificationToken -forgotPasswordToken -passwordSalt -hashedPassword"
-    );
+    const userData = await UserModel.findById(userId).select('-createdAt -updatedAt -isDeleted -emailVerificationToken -forgotPasswordToken -passwordSalt -hashedPassword');
     if (!userData) {
-      return res.status(400).json({
-        statusCode: 400,
-        code: "FAIL",
-        message: "Invalid user",
-        data: {},
-      });
+      return res.error('Invalid user');
     }
 
-    return res.status(200).json({
-      statusCode: 200,
-      code: "SUCCESS",
-      message: messages.SUCCESS_MESSAGE,
+    return res.ok({
       data: {
         user: userData,
       },
     });
   } catch (error) {
-    console.log("--error::::", error);
-    res.status(500).json({
-      statusCode: 500,
-      code: "FAIL",
-      message: messages.INTERNAL_SERVER_ERROR_MESSAGE,
-      error: error,
-      data: {},
-    });
+    console.log('--error::::', error);
+    res.internalServerError();
   }
 };
 
 const updateProfile = async (req, res) => {
   try {
+    const { firstName, lastName, telephone } = req.validatedParams;
     const userId = req.userId;
-    const { firstName, lastName, telephone } = req.body;
 
-    console.log("userId from update profile :::::: >>>>>", userId);
+    console.log('userId from update profile :::::: >>>>>', userId);
 
     const user = await UserModel.findById(userId);
     if (!user) {
-      return res.status(400).json({
-        statusCode: 400,
-        code: "FAIL",
-        message: "Invalid user",
-        data: {},
-      });
+      return res.error('Invalid user');
     }
 
     user.firstName = firstName;
@@ -232,39 +101,25 @@ const updateProfile = async (req, res) => {
 
     await user.save();
 
-    return res.status(200).json({
-      statusCode: 200,
-      code: "SUCCESS",
-      message: "Profile updated successfully",
+    return res.ok({
       data: {
         user: user,
       },
     });
   } catch (error) {
-    console.log("--error::::", error);
-    res.status(500).json({
-      statusCode: 500,
-      code: "FAIL",
-      message: "Internal server error",
-      error: error,
-      data: {},
-    });
+    console.log('--error::::', error);
+    res.internalServerError();
   }
 };
 
 const updatePassword = async (req, res) => {
   try {
     const userId = req.userId;
-    const { oldPassword, newPassword } = req.body;
+    const { oldPassword, newPassword } = req.validatedParams;
 
     const user = await UserModel.findById(userId);
     if (!user) {
-      return res.status(400).json({
-        statusCode: 400,
-        code: "FAIL",
-        message: "Invalid user",
-        data: {},
-      });
+      return res.error('Invalid user');
     }
 
     const { hashStr } = hashString({
@@ -272,57 +127,40 @@ const updatePassword = async (req, res) => {
       salt: user.passwordSalt,
     });
     if (hashStr !== user.hashedPassword) {
-      return res.status(400).json({
-        statusCode: 400,
-        code: "FAIL",
-        message: "Invalid old password",
-        data: {},
-      });
+      return res.error('Invalid old password');
     }
 
-    const salt = crypto.randomBytes(16).toString("hex");
+    const salt = crypto.randomBytes(16).toString('hex');
     const { hashStr: newHashStr } = hashString({ password: newPassword, salt });
     user.hashedPassword = newHashStr;
     user.passwordSalt = salt;
 
     await user.save();
 
-    return res.status(200).json({
-      statusCode: 200,
-      code: "SUCCESS",
-      message: "Password updated successfully",
+    return res.ok({
       data: {},
     });
   } catch (error) {
-    res.status(500).json({
-      statusCode: 500,
-      code: "FAIL",
-      message: "Internal server error",
-      error: error,
-      data: {},
-    });
+    res.internalServerError();
   }
 };
 
 const logout = async (req, res) => {
   try {
     if (!req.userId) {
-      res.status(401).json({ success: false, message: "Not authenticated" });
+      res.error('Not authenticated');
     }
-    const token = req.headers.authorization.split(" ")[1];
+    const token = req.headers.authorization.split(' ')[1];
     if (!token) {
-      return res.status(401).json({ success: false, message: "Auth fail" });
+      return res.error('Auth fail');
     }
     const newTokens = token;
 
     await UserModel.findByIdAndUpdate(req.userId, { tokens: newTokens });
-    res.json({ success: true, message: "Log out success" });
+    res.ok({ data: {} });
   } catch (error) {
     console.log(error);
-    res.status(500).json({
-      success: false,
-      message: "Internal Server Error",
-    });
+    res.internalServerError();
   }
 };
 

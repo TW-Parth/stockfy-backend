@@ -2,18 +2,15 @@ const Joi = require("joi");
 
 function validateSchema(schema) {
   return async function (req, res, next) {
-    const result = schema.validate(req.body);
-    const { value, error } = result;
+    const params = req.allParams();
 
-    if (error) {
-      return res.status(400).json({
-        statusCode: 400,
-        code: "FAIL",
-        message: error.message,
-        data: {},
-      });
+    const valid = schema.validate(params);
+    req.validatedParams = valid.value;
+
+    if (valid.error) {
+      return res.error(valid.error);
     }
-    req.body = value;
+    
     next();
   };
 }
