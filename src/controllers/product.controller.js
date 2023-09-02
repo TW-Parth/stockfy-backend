@@ -4,11 +4,12 @@ const csv = require('csvtojson');
 const importProducts = async (req, res) => {
   try {
     const file = req.files[0];
-
+    const userId = req.userId;
     const csvFileData = await csv({}).fromString(file.buffer.toString('utf8'));
     const bulkOperation = ProductModel.collection.initializeUnorderedBulkOp();
     for (const data of csvFileData) {
       const updateData = {
+        userId,
         orderId: data.orderId,
         orderDate: data.orderDate,
         shipDate: data.shipDate,

@@ -1,10 +1,11 @@
 const { Schema } = require('mongoose');
 const { uuid } = require('uuid');
-const {  PRODUCT_TYPE } = require('../constants/enums');
+const { PRODUCT_TYPE } = require('../constants/enums');
 const { dbConnection } = require('../helpers/mongoose.helper');
 
 const productSchema = new Schema(
   {
+    userId: { type: Schema.Types.ObjectId, ref: 'users' },
     orderId: { type: String, default: '' },
     orderDate: { type: String, default: '' },
     shipDate: { type: String, default: '' },
@@ -39,5 +40,5 @@ const productSchema = new Schema(
 const ProductModel = dbConnection.model('products', productSchema, 'products');
 
 module.exports = {
-    ProductModel,
+  ProductModel,
 };
