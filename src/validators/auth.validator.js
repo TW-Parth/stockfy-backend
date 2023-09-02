@@ -23,7 +23,14 @@ const forgotPasswordSchema = Joi.object().keys({
 const updateProfileSchema = Joi.object().keys({
   firstName: Joi.string().alphanum().min(2).max(30).required().trim().error(new Error('Invalid first Name')),
   lastName: Joi.string().alphanum().min(2).max(30).required().trim().error(new Error('Invalid last Name')),
-  telephone: Joi.string().min(10).max(15).trim().optional().error(new Error('Invalid telephone')),
+  phoneNumber: Joi.string().min(10).max(15).trim().optional().error(new Error('Invalid phone Number')),
+  eCommerceName: Joi.string().max(50).trim().optional().error(new Error('Invalid eCommerce Name')),
+  eCommerceWebsite: Joi.string().uri().trim().optional().error(new Error('Invalid eCommerce Website')),
+});
+
+const updatePasswordSchema = Joi.object().keys({
+  oldPassword: Joi.string().min(8).required().trim().error(new Error('Invalid old password')),
+  newPassword: Joi.string().min(8).required().trim().error(new Error('Invalid new password')),
 });
 
 module.exports = {
@@ -31,4 +38,5 @@ module.exports = {
   loginSchema,
   forgotPasswordSchema,
   updateProfileSchema,
+  updatePasswordSchema,
 };

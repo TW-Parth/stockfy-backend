@@ -85,7 +85,8 @@ const getProfile = async (req, res) => {
 
 const updateProfile = async (req, res) => {
   try {
-    const { firstName, lastName, telephone } = req.validatedParams;
+    console.log(req.validatedParams);
+    const { firstName, lastName, phoneNumber, eCommerceName, eCommerceWebsite } = req.validatedParams;
     const userId = req.userId;
 
     console.log('userId from update profile :::::: >>>>>', userId);
@@ -97,7 +98,9 @@ const updateProfile = async (req, res) => {
 
     user.firstName = firstName;
     user.lastName = lastName;
-    user.telephone = telephone;
+    user.phoneNumber = phoneNumber;
+    user.eCommerceName = eCommerceName;
+    user.eCommerceWebsite = eCommerceWebsite;
 
     await user.save();
 
@@ -141,6 +144,7 @@ const updatePassword = async (req, res) => {
       data: {},
     });
   } catch (error) {
+    console.log(error);
     res.internalServerError();
   }
 };
