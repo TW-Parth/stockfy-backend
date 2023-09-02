@@ -3,7 +3,7 @@ const router = express.Router();
 const webhookRouter = require('./webhook.route');
 const authRouter = require('./auth.route');
 const productRouter = require('./product.route');
-const { required } = require('joi');
+const dashboardRouter = require('./dashboard.route');
 
 router.get('/ping', function (req, res) {
   res.ok({ message: 'HEALTH IS GOOD' });
@@ -12,5 +12,6 @@ router.get('/ping', function (req, res) {
 router.use('/auth', authRouter);
 router.use('/product', productRouter);
 router.use('/webhook', webhookRouter);
+router.use('/dashboard', dashboardRouter);
 
 module.exports = router;
