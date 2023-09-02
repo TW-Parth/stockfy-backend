@@ -1,3 +1,4 @@
 {
-  "mongoUrl": "mongodb://localhost:27017/stockfy-backend"
+  "mongoUrl": "mongodb://localhost:27017/stockfy-backend",
+  "webhookUrl": "http://localhost:5000/webhook/"
 }
