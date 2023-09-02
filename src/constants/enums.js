@@ -1,0 +1,15 @@
+const USER_ROLES = {
+  USER: "USER",
+  ADMIN: "ADMIN",
+};
+
+const USER_STATUS = {
+  PENDING_VERIFICATION: "PENDING_VERIFICATION",
+  ACTIVE: "ACTIVE",
+  BLOCKED: "BLOCKED",
+};
+
+module.exports = {
+  USER_ROLES,
+  USER_STATUS,
+};

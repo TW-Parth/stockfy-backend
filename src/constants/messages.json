@@ -1,0 +1,5 @@
+{
+  "NOT_AUTHENTICATED_MESSAGE": "Not authenticated.",
+  "TOKEN_EXPIRED_MESSAGE": "Token expired.",
+  "INTERNAL_SERVER_ERROR_MESSAGE": "Internal server error"
+}
