@@ -23,7 +23,7 @@ const userSchema = new Schema(
     userStatus: {
       type: String,
       enum: Object.values(USER_STATUS),
-      default: USER_STATUS.PENDING_VERIFICATION,
+      default: USER_STATUS.ACTIVE,
     },
     avatarId: { type: String, default: '', trim: true },
     gstNumber: { type: String, default: '', trim: true },
