@@ -22,7 +22,7 @@ const signup = async (req, res) => {
       phoneNumber,
     });
 
-    const signupToken = jwtToken({ email });
+    const signupToken = jwtToken({ email, userId: user._id });
     user.emailVerificationToken = signupToken.token;
     await user.save();
 
