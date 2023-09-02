@@ -2,7 +2,7 @@ const { Schema } = require('mongoose');
 const { uuid } = require('uuid');
 const { dbConnection } = require('../helpers/mongoose.helper');
 
-const ContactUsModel = new Schema(
+const contactUsSchema = new Schema(
   {
     firstName: { type: String, default: '', trim: true },
     lastName: { type: String, default: '', trim: true },
@@ -16,7 +16,7 @@ const ContactUsModel = new Schema(
   },
 );
 
-const UserModel = dbConnection.model('contactUs', contactUsSchema, 'contactUs');
+const ContactUsModel = dbConnection.model('contactUs', contactUsSchema, 'contactUs');
 
 module.exports = {
   ContactUsModel,

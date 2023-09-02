@@ -15,22 +15,25 @@ const contactUs = async (req, res) => {
 
     await contactUsData.save();
 
-    return res.status(200).json({
-      statusCode: 200,
-      code: 'SUCCESS',
-      message: 'Contact information saved successfully',
+    return res.ok({
       data: {},
     });
   } catch (error) {
-    console.log(error);
-    res.status(500).json({
-      statusCode: 500,
-      code: 'FAIL',
-      message: 'Internal server error',
-      error: error,
-      data: {},
-    });
+    res.internalServerError();
   }
 };
 
-module.exports = { contactUs };
+const getAll = async (req, res) => {
+  try {
+    const contacts = await ContactUsModel.find();
+
+    return res.ok({
+      data: contacts,
+    });
+  } catch (error) {
+    console.log(error);
+    res.internalServerError();
+  }
+};
+
+module.exports = { contactUs, getAll };
