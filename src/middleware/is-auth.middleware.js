@@ -15,7 +15,7 @@ const isAuth = (req, res, next) => {
     if (error.message) {
       return res.error('Token expired.');
     }
-
+    console.log('HI ----------');
     res.internalServerError();
   }
 };
